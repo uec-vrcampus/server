@@ -1,0 +1,31 @@
+version: '3'
+services:
+  app:
+    restart: always
+    build: .
+    container_name: 'app'
+    working_dir: '/root/'
+    tty: true
+    volumes:
+      - ./app:/root/app
+    ports:
+      - 8000:8000
+    networks:
+      - nginx_network
+  web:
+    container_name: web
+    image: nginx:alpine
+    depends_on:
+      - app
+    ports:
+      # - "80:80"
+      - "${PORT:-8443:443}"
+    volumes:
+      - ./web/conf.d:/etc/nginx/conf.d
+      - ./web/ssl:/etc/nginx/ssl
+    networks:
+      - nginx_network
+
+networks:
+  nginx_network:
+    driver: bridge
